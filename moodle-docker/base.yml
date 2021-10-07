@@ -1,0 +1,37 @@
+version: "2"
+services:
+  webserver:
+    image: "moodlehq/moodle-php-apache:${MOODLE_DOCKER_PHP_VERSION}"
+    depends_on:
+      - db
+    volumes:
+      - "${MOODLE_DOCKER_WWWROOT}:/var/www/html"
+      - "${ASSETDIR}/web/apache2_faildumps.conf:/etc/apache2/conf-enabled/apache2_faildumps.conf"
+      - "${ASSETDIR}/web/conf:/usr/local/etc/php"
+      - "${ASSETDIR}/web/extensions:/usr/local/lib/php/extensions/no-debug-non-zts-20180731"
+    environment:
+      MOODLE_DOCKER_DBTYPE: pgsql
+      MOODLE_DOCKER_DBNAME: base400
+      MOODLE_DOCKER_DBUSER: moodle
+      MOODLE_DOCKER_DBPASS: "m@0dl3ing"
+      MOODLE_DOCKER_BROWSER: firefox
+      MOODLE_DOCKER_WEB_HOST: "${MOODLE_DOCKER_WEB_HOST}"
+  db:
+    image: postgres:11
+    environment:
+      POSTGRES_USER: moodle
+      POSTGRES_PASSWORD: "m@0dl3ing"
+      POSTGRES_DB: base400
+    ports:
+      - "5432:5432"
+  exttests:
+    image: moodlehq/moodle-exttests
+    volumes:
+      - "${ASSETDIR}/exttests/apache2_ports.conf:/etc/apache2/ports.conf"
+      - "${ASSETDIR}/exttests/apache2.conf:/etc/apache2/sites-enabled/000-default.conf"
+  selenium:
+    image: "selenium/standalone-firefox${MOODLE_DOCKER_SELENIUM_SUFFIX}:2.53.1"
+    volumes:
+      - "${MOODLE_DOCKER_WWWROOT}:/var/www/html:ro"
+    ports:
+      - "4444:4444"

@@ -1,0 +1,1 @@
+This folder is a modified copy of https://github.com/moodlehq/moodle-docker
